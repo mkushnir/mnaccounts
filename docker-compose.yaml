@@ -1,0 +1,31 @@
+version: '3.7'
+
+services:
+  api:
+    image: accounts-api
+    build:
+      context: ${PWD}
+      dockerfile: ${PWD}/Dockerfile
+      target: app-api
+    hostname: ${ACCOUNTS_HOSTNAME}
+    env_file: api/.env
+    ports:
+      - 127.0.0.1:5000:5000
+    volumes:
+      - type: bind
+        source: ${PWD}/doc
+        target: /opt/doc
+      - type: bind
+        source: ${PWD}/db
+        target: /opt/db
+
+  static:
+    image: accounts-static
+    build:
+      context: ${PWD}
+      dockerfile: ${PWD}/Dockerfile
+      target: app-static
+    hostname: ${ACCOUNTS_HOSTNAME}
+    env_file: static/.env
+    ports:
+      - 127.0.0.1:3000:3000
