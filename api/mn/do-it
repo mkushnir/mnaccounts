@@ -15,7 +15,7 @@ then
 elif test "$1" = run
 then
     set -a; . .env; set +a
-    flask --app mnaccounts  run --host 127.0.0.1 --port $SERVER_PORT
+    flask --app mnaccounts.app  run --host 127.0.0.1 --port $SERVER_PORT
 
 elif test "$1" = grun
 then
@@ -24,12 +24,13 @@ then
 
 elif test "$1" = docker
 then
+    set -a; . .env; set +a
     docker container run \
         --name mnaccounts-api-run-1 \
         --rm \
         --env-file .env \
         --hostname `hostname` \
-        -p 127.0.0.1:5000:5000 \
+        -p 127.0.0.1:${SERVER_PORT}:${SERVER_PORT} \
         -v `pwd`/..:/opt/src \
         -v `pwd`/../db:/opt/db \
         -ti \

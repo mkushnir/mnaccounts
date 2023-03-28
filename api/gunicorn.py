@@ -46,7 +46,7 @@ logconfig_dict = {
 
 
 import os
-bind = ['127.0.0.1:{}'.format(os.environ['SERVER_PORT'])]
+bind = ['{}:{}'.format(os.environ['SERVER_HOST'], os.environ['SERVER_PORT'])]
 workers = 16
 threads = 4
 #daemon = True

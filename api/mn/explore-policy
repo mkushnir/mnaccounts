@@ -1,0 +1,84 @@
+#!/usr/bin/env python3
+
+import os
+os.environ['MNACCOUNTS_APP_CONFIG_FILE'] = 'development.config'
+
+import sys
+import urllib.parse
+
+
+from flask.testing import FlaskClient
+import flask
+
+import mnaccounts.db
+from mnaccounts.app import app
+
+def test0():
+    from mnaccounts.policy import policy_eval_all
+
+    preds = (
+        'req.method == "GET"',
+        'req.path == "/qwe"',
+    )
+
+    res = policy_eval_all(req, preds)
+    print(res)
+
+
+def test1():
+    from mnaccounts.policy import policy_action
+
+    env = {
+            'REQUEST_METHOD': 'GET',
+            'PATH_INFO': '/asd',
+    }
+    req = flask.Request(env)
+
+
+    p0 = """
+    * (req.method == "GET" and req.path == '/qwe') reject;
+    * (req.method == "GET" and req.path == '/asd') null;
+    * True accept;
+    """
+
+    tag, action = policy_action(req, p0)
+    print(tag, action)
+
+    p1 = """
+    * req.method == "GET" and req.path == '/qwe' accept;
+    1 req.method == "GET" and req.path == '/asd' null;
+    2 True reject;
+    """
+
+    tag, action = policy_action(req, p0)
+    print(tag, action)
+
+
+def test2():
+    from mnaccounts.policy import policy_action
+
+    env = {
+            'REQUEST_METHOD': 'GET',
+            'PATH_INFO': '/asd',
+    }
+    req = flask.Request(env)
+
+
+    p0 = """
+    ! req.method == "GET" null;
+    $ all([1, 0,0 ,0 ]) accept;
+    & True reject;
+    """
+
+    tag, action = policy_action(req, p0)
+    print(tag, action)
+
+def main():
+    #mnaccounts.db.init()
+    #test0()
+    #test1()
+    test2()
+
+
+if __name__ == '__main__':
+    sys.exit(main())

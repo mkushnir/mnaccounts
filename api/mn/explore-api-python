@@ -1,0 +1,72 @@
+#!/usr/bin/env python3
+import os
+if 'MNACCOUNT_APP_CONFIG_FILE' not in os.environ:
+    os.environ['MNACCOUNT_APP_CONFIG_FILE'] = 'development.config'
+
+import sys
+import json
+import datetime
+
+from mnaccounts.client import MNAccountClient, MNAccountAPIClient
+
+def test_account(client):
+    #data = client.account_post('mkushnir', '123456', 'pa0')
+    data = client.account_post('alice', '123456', 'pa0')
+    print(data)
+    data = client.account_delete(data['ticket']['ticket'])
+    print(data)
+
+
+def test_version(client):
+    #data = client.api_version()
+    data = client.api_audit_loggedin()
+    print(data)
+
+def test_user(client):
+    data = client.api_user_get()
+    print(data)
+
+
+    if not any(i for i in data if i['login'] == 'tato'):
+        user = {
+            'id': None,
+            'login': 'tato',
+            'email': 'tato@gmail.com',
+            'password': '123456',
+            'is_active': True,
+            'is_anonymous': False,
+            'is_authenticated': False,
+        }
+        data = client.api_user_post(user)
+        print(data)
+
+    else:
+        data = [i for i in data if i['login'] == 'tato'][0]
+
+    data['login'] = 'tato-{}'.format(datetime.datetime.utcnow().strftime('%Y%m%d%H%M%S'))
+    data = client.api_user_put(data)
+    print(data)
+
+    #data = client.api_user_delete(data['id'])
+    #print(data)
+
+
+
+def main():
+    #client = MNAccountClient(
+    #    'http://localhost:{}'.format(os.environ['SERVER_PORT'])
+    #)
+    #test_account(client)
+
+    client = MNAccountAPIClient(
+        'https://accounts.sama.energy:{}'.format(os.environ['SERVER_PORT_SSL']),
+        'https://dev-001.sama.energy:443',
+        ('swadmin', '123456', 'dev-001')
+    )
+
+    test_version(client)
+    #test_user(client)
+
+
+if __name__ == '__main__':
+    sys.exit(main())

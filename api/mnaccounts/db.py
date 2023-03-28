@@ -1,18 +1,20 @@
 """MN Accounts Service Database."""
-import logging
 from datetime import date, datetime
-import csv
+import json
 
 from sqlalchemy import engine_from_config, event
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session
 from sqlalchemy.orm import sessionmaker
 
-from .logger import get_logger
 from .config import Config
 from .model import Base, to_dict
 
 from .model.user import User
+from .model.target import Target
+from .model.policy import Policy
+from .model.user_target_policy import UserTargetPolicy
+from .model.ticket import Ticket
 
 engine = None
 session = None
@@ -31,46 +33,35 @@ def init():
     session = sessionmaker(engine, expire_on_commit=False)
 
 
-def _load_users(sess):
-    from .login import bcrypt
+def _load_data(sess, fname):
+    from .account import bcrypt
+    with open(fname) as f:
+        data = json.load(f)
 
-    sess.add_all([
-        User(
-            id=1,
-            login='mkushnir',
-            email='markiyan.kushnir@gmail.com',
-            hash=bcrypt.generate_password_hash('123456'),
-            apikey='123456',
-            is_authenticated=True,
-            is_active=True,
-            is_anonymous=False,
-        ),
-        User(
-            id=2,
-            login='alice',
-            email='vfhrszyreiysh@gmail.com',
-            hash=bcrypt.generate_password_hash('123456'),
-            apikey='234567',
-            is_authenticated=True,
-            is_active=True,
-            is_anonymous=False,
-        ),
-    ])
+        for i in data['user']:
+            i['hash'] = bcrypt.generate_password_hash(i.pop('password'))
+            sess.add(User(**i))
 
+        for i in data['target']:
+            sess.add(Target(**i))
 
-def _load_vocabs(sess):
-    pass
+        for i in data['policy']:
+            sess.add(Policy(**i))
 
+        for i in data['user_target_policy']:
+            sess.add(UserTargetPolicy(**i))
 
 def reset():
     # init...
     Base.metadata.drop_all(engine)
     Base.metadata.create_all(engine)
 
-    with session() as sess:
-        _load_users(sess)
-        _load_vocabs(sess)
-        sess.commit()
+    c = Config()
+    if 'VOCABULARY_FILES' in c:
+        with session() as sess:
+            for fname in c['VOCABULARY_FILES']:
+                _load_data(sess, fname)
+                sess.commit()
 
 
 def bootstrap(catofile):

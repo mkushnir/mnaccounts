@@ -2,8 +2,8 @@ from sqlalchemy import Column, BigInteger, Integer, Boolean, String, DateTime, F
 
 from . import Base
 
-class User(Base):
-    __tablename__ = 'user'
+class FlaskUser(Base):
+    __tablename__ = 'flaskuser'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
 
@@ -16,33 +16,35 @@ class User(Base):
     id_token = Column(String, nullable=True)
     refresh_token = Column(String, nullable=True)
 
-    # flask
     is_authenticated = Column(Boolean, nullable=False)
     is_active = Column(Boolean, nullable=False)
     is_anonymous = Column(Boolean, nullable=False)
 
+    policy = Column(String)
     authstate = Column(String, index=True)
 
+    def get_id(self):
+        return self.id
+
+    def get_policy(self):
+        return self.policy
 
 UniqueConstraint(
-    User.login,
-    name='uc_user_login',
+    FlaskUser.login,
+    name='uc_flaskuser_login',
 )
 
-
 UniqueConstraint(
-    User.hash,
-    name='uc_user_hash',
+    FlaskUser.hash,
+    name='uc_flaskuser_hash',
 )
 
-
 UniqueConstraint(
-    User.apikey,
-    name='uc_user_apikey',
+    FlaskUser.apikey,
+    name='uc_flaskuser_apikey',
 )
 
-
 UniqueConstraint(
-    User.access_token,
-    name='uc_user_access_token',
+    FlaskUser.access_token,
+    name='uc_flaskuser_access_token',
 )

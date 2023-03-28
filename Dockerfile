@@ -1,6 +1,6 @@
 FROM alpine as platform-base
 RUN apk update q
-RUN apk add build-base git vim curl
+RUN apk add build-base git vim curl sqlite
 WORKDIR /opt/src
 COPY . .
 RUN git config --global --add safe.directory /opt/src
@@ -10,7 +10,7 @@ FROM platform-base as app-api
 RUN apk add python3 python3-dev py3-pip
 RUN cd api && pip install -U pip
 RUN cd api && pip install -e .
-CMD cd api && flask --app pndlmearchive  run --host ${HOSTNAME}
+CMD cd api && flask --app mnaccounts  run --host ${HOSTNAME}
 
 
 FROM platform-base as app-static

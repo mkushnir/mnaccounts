@@ -2,12 +2,12 @@ version: '3.7'
 
 services:
   api:
-    image: accounts-api
+    image: mnaccounts-api
     build:
       context: ${PWD}
       dockerfile: ${PWD}/Dockerfile
       target: app-api
-    hostname: ${ACCOUNTS_HOSTNAME}
+    hostname: ${MNACCOUNTS_HOSTNAME}
     env_file: api/.env
     ports:
       - 127.0.0.1:5000:5000
@@ -20,12 +20,12 @@ services:
         target: /opt/db
 
   static:
-    image: accounts-static
+    image: mnaccounts-static
     build:
       context: ${PWD}
       dockerfile: ${PWD}/Dockerfile
       target: app-static
-    hostname: ${ACCOUNTS_HOSTNAME}
+    hostname: ${MNACCOUNTS_HOSTNAME}
     env_file: static/.env
     ports:
       - 127.0.0.1:3000:3000
