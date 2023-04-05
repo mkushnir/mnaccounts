@@ -38,11 +38,7 @@ cors = CORS(
     app,
     resources={
         '/*': {
-            'origins': [
-                'https://mkushnir.mooo.com:8912',
-                'https://mkushnir.mooo.com:8914',
-                'https://accounts.google.com',
-            ],
+            'origins': app.config['ORIGINS'],
             'supports_credentials': True,
         }
     },

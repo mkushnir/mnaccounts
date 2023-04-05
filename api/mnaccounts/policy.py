@@ -15,10 +15,16 @@ def policy_eval_all(req, preds):
     return all(_policy_eval(req, i) for i in preds)
 
 
-def policy_action(req, policy):
+def policy_action(user, req, policy, tag_selector=None):
     items = policy_parse(policy)
     for idx, (tag, pred, action) in enumerate(items):
+        tag_ = tag.strip()
 
-        tag, res = _policy_eval(req, tag.strip(), pred.strip())
+        if tag_selector is not None and not tag_ in tag_selector:
+            continue
+
+        tag, res = _policy_eval(user, req, tag.strip(), pred.strip())
         if res:
-            return tag, action
+            return idx, tag, action
+
+    return None, None, None

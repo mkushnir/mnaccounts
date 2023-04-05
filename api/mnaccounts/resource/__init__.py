@@ -80,11 +80,15 @@ def mnaccess_policy(f):
         #app.logger.info('policy {}'.format(policy))
 
         if policy:
-            tag, action = policy_action(flask.request, policy)
+            idx, tag, action = policy_action(
+                current_user,
+                flask.request,
+                policy,
+                ('api-mnaccounts',))
             if action == 'reject':
                 res = {
                     'msg': 'mnPolicyAccess',
-                    'args': [current_user.login, tag],
+                    'args': [current_user.login, idx, tag],
                 }
                 return res, 403
 

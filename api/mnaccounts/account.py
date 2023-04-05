@@ -234,26 +234,26 @@ def _account_delete():
 def load_user_from_request(request):
     #app.logger.info('SESS {}'.format(flask.session))
 
-    if 'creds' not in flask.session:
+    if 'uinfo' not in flask.session:
         return None
 
-    user = validate_mnaccount(flask.session['creds'])
+    user = validate_mnaccount(flask.session['uinfo'])
 
     return user
 
 
-def validate_mnaccount(creds):
-    ticket = creds['ticket']
+def validate_mnaccount(uinfo):
+    ticket = uinfo['ticket']
     since = datetime.strptime(ticket['valid_since'], '%Y-%m-%dT%H:%M:%S')
     until = datetime.strptime(ticket['valid_until'], '%Y-%m-%dT%H:%M:%S')
     now = datetime.utcnow()
     user = None
 
     if (now < since) or (now > until):
-        app.logger.warning('expired creds{} now {}'.format(creds, now))
+        app.logger.warning('expired uinfo{} now {}'.format(uinfo, now))
     else:
-        user = FlaskUser(**creds['user'])
-        user.policy = creds['policy']['statement']
+        user = FlaskUser(**uinfo['user'])
+        user.policy = uinfo['policy']['statement']
 
     return user
 
@@ -270,10 +270,10 @@ def login_mnaccount():
             'ticket': flask.request.args['ticket'],
         }
 
-        if 'MNACCOUNT_AUTH_PARAMS' in app.config:
-            params.update(app.config['MNACCOUNT_AUTH_PARAMS'])
+        if 'MNACCOUNTS_AUTH_PARAMS' in app.config:
+            params.update(app.config['MNACCOUNTS_AUTH_PARAMS'])
 
-        mnaccount_url = app.config['MNACCOUNT_AUTH_URI']
+        mnaccount_url = app.config['MNACCOUNTS_AUTH_URI']
         response = requests.get(
             mnaccount_url,
             headers=headers,
@@ -284,9 +284,9 @@ def login_mnaccount():
             raise Exception(['mnaccount', response.text])
 
         else:
-            creds = response.json()
+            uinfo = response.json()
 
-            user = validate_mnaccount(creds)
+            user = validate_mnaccount(uinfo)
 
             if user is None:
                 app.logger.debug('login failure params {}'.format(params))
@@ -294,12 +294,12 @@ def login_mnaccount():
 
             login_user(user)
 
-            flask.session['creds'] = creds
+            flask.session['uinfo'] = uinfo
 
-            #app.logger.info('mnaccount {}'.format(creds))
+            #app.logger.info('mnaccount {}'.format(uinfo))
 
             res = {
-                'data': creds
+                'data': uinfo
             }
 
             rv = flask.make_response(json.dumps(res, cls=MyJSONEncoder))
