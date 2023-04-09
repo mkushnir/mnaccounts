@@ -27,4 +27,4 @@ def policy_action(user, req, policy, tag_selector=None):
         if res:
             return idx, tag, action
 
-    return None, None, None
+    return -1, None, None

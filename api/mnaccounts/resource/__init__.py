@@ -85,6 +85,7 @@ def mnaccess_policy(f):
                 flask.request,
                 policy,
                 ('api-mnaccounts',))
+
             if action == 'reject':
                 res = {
                     'msg': 'mnPolicyAccess',
@@ -98,11 +99,22 @@ def mnaccess_policy(f):
                 }
                 return res, 200
 
-            else:
+            elif action == 'accept':
                 return f(*args, **kwargs)
+
+            else:
+                res = {
+                    'msg': 'mnPolicyAccess',
+                    'args': [current_user.login, idx, tag],
+                }
+                return res, 403
+
         else:
-            # XXX return 403?
-            return f(*args, **kwargs)
+            res = {
+                'msg': 'mnPolicyAccess',
+                'args': [current_user.login, None, None],
+            }
+            return res, 403
 
     return wrapper
 

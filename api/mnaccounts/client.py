@@ -1,6 +1,7 @@
 import os
 import pickle
 import json
+from urllib.parse import urlparse
 
 import requests
 from requests.auth import AuthBase
@@ -105,7 +106,7 @@ class MNAccountAPIClient:
     _session_cookie_file = '.mnaccountapiclient.cookie'
     # copy-paste form PNDLMEArchiveClient
 
-    def __init__(self, auth_url, api_url, creds):
+    def __init__(self, auth_url, creds):
         self._session = requests.Session()
 
         if os.path.exists(self._session_cookie_file):
@@ -114,22 +115,9 @@ class MNAccountAPIClient:
                 self._session.cookies.update(saved_cookie)
 
         self._auth_url = auth_url
-        self._api_url = api_url
         self._creds = creds
         self._login()
-
-
-    def _login(self, force=False):
-        if ('session' in self._session.cookies) and not force:
-            return
-
-        data = {
-            'login': self._creds[0],
-            'password': self._creds[1],
-            'target': self._creds[2],
-        }
-
-        res = self._auth_call('post', '/account', data=data)
+        self._discover_api_url()
 
     def _call(self, url, method, endpoint, params=None, data=None, retry_on_401=True):
         headers = {
@@ -179,24 +167,45 @@ class MNAccountAPIClient:
     def _api_call(self, method, endpoint, params=None, data=None, retry_on_401=True):
         return self._call(self._api_url, method, endpoint, params, data, retry_on_401)
 
-    def api_audit_loggedin(self):
-        res = self._api_call('get', '/api/audit/loggedin')
-        return res['data']
+    def _login(self, force=False):
+        if ('session' in self._session.cookies) and not force:
+            return
+
+        data = {
+            'login': self._creds[0],
+            'password': self._creds[1],
+            'target': self._creds[2],
+        }
+
+        self._auth_call('post', '/account', data=data)
+
+    def _discover_api_url(self):
+        tmpurl = urlparse(self._auth_url)
+        self._api_url = '{}://{}'.format(tmpurl.scheme, tmpurl.netloc)
+        data = self.api_user_get(login=self._creds[0])
+        user = data[0]
+        data = self.api_user_target_get(user_id=user['id'])
+        t = [i for i in data if i['label'] == self._creds[2]]
+        url = urlparse(t[0]['url'])
+        self._api_url = '{}://{}'.format(url.scheme, url.netloc)
 
     def api_version(self):
         res = self._api_call('get', '/v1/version')
         return res['data']
 
     def api_init(self):
-        res = self._api_call('get', '/v1/init')
+        res = self._api_call('put', '/v1/init')
         return res['data']
 
     # user
-    def api_user_get(self, user_id=None):
+    def api_user_get(self, user_id=None, login=None):
         if user_id is not None:
             res = self._api_call('get', '/v1/user/{}'.format(user_id))
         else:
-            res = self._api_call('get', '/v1/user')
+            params = {}
+            if login is not None:
+                params['user.login'] = login
+            res = self._api_call('get', '/v1/user', params)
         return res['data']
 
     def api_user_post(self, data):
@@ -257,6 +266,26 @@ class MNAccountAPIClient:
             res = self._api_call('get', '/v1/user_target_policy/{}'.format(user_target_policy_id))
         else:
             res = self._api_call('get', '/v1/user_target_policy')
+        return res['data']
+
+    def api_user_target_policy_post(self, data):
+        res = self._api_call('post', '/v1/user_target_policy', data=data)
+        return res['data']
+
+    def api_user_target_policy_put(self, data):
+        res = self._api_call('put', '/v1/user_target_policy/{}'.format(data['id']), data=data)
+        return res['data']
+
+    def api_user_target_policy_delete(self, user_target_policy_id):
+        res = self._api_call('delete', '/v1/user_target_policy/{}'.format(user_target_policy_id))
+        return res['data']
+
+    # user_target
+    def api_user_target_get(self, user_id=None):
+        params = {}
+        if user_id is not None:
+            params['user.id'] = user_id
+        res = self._api_call('get', '/v1/user_target', params=params)
         return res['data']
 
     def api_user_target_policy_post(self, data):

@@ -7,6 +7,7 @@ from ..model.user import User
 from ..model.target import Target
 from ..model.policy import Policy
 from ..model.user_target_policy import UserTargetPolicy
+from ..model.user_target import UserTarget
 from ..model.ticket import Ticket
 
 from . import SimpleResource
@@ -48,6 +49,10 @@ class PolicyResource(SimpleResource):
 
 class UserTargetPolicyResource(SimpleResource):
     _model = UserTargetPolicy
+
+
+class UserTargetResource(SimpleResource):
+    _model = UserTarget
 
 
 class TicketResource(SimpleResource):

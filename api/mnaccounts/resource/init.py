@@ -7,3 +7,6 @@ from .. import db
 class InitResource(Resource):
     def put(self):
         db.reset()
+        return {
+            'data': None
+        }

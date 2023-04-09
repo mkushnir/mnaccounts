@@ -17,6 +17,7 @@ from .resource.simple import (
     TargetResource,
     PolicyResource,
     UserTargetPolicyResource,
+    UserTargetResource,
     TicketResource,
 )
 
@@ -55,4 +56,5 @@ api.add_resource(UserResource, '/v1/user', '/v1/user/<int:id>')
 api.add_resource(TargetResource, '/v1/target', '/v1/target/<int:id>')
 api.add_resource(PolicyResource, '/v1/policy', '/v1/policy/<int:id>')
 api.add_resource(UserTargetPolicyResource, '/v1/user_target_policy', '/v1/user_target_policy/<int:id>')
+api.add_resource(UserTargetResource, '/v1/user_target')
 api.add_resource(TicketResource, '/v1/ticket', '/v1/ticket/<int:id>')
