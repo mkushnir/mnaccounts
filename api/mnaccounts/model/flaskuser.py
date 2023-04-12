@@ -22,6 +22,7 @@ class FlaskUser(Base):
 
     policy = Column(String)
     authstate = Column(String, index=True)
+    ticket_lifetime = Column(Integer, nullable=True)
 
     def get_id(self):
         return self.id

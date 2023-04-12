@@ -1,4 +1,4 @@
-"""Base Resource.ffromrom"""
+"""Base Resource."""
 import json
 from functools import wraps
 from datetime import datetime
@@ -66,8 +66,6 @@ def mnaccess_policy(f):
     @wraps(f)
     def wrapper(*args, **kwargs):
 
-        from mnaccounts.app import app
-
         if not hasattr(current_user, 'get_policy'):
             res = {
                 'msg': 'mnPolicyAccess',
@@ -77,14 +75,15 @@ def mnaccess_policy(f):
 
         policy = current_user.get_policy()
 
-        #app.logger.info('policy {}'.format(policy))
-
         if policy:
             idx, tag, action = policy_action(
+                flask.session,
                 current_user,
                 flask.request,
                 policy,
-                ('api-mnaccounts',))
+                (
+                    'api-swaccounts',
+                ))
 
             if action == 'reject':
                 res = {
@@ -108,7 +107,6 @@ def mnaccess_policy(f):
                     'args': [current_user.login, idx, tag],
                 }
                 return res, 403
-
         else:
             res = {
                 'msg': 'mnPolicyAccess',
@@ -255,7 +253,7 @@ class SimpleResource(Resource, metaclass=SimpleResourceType):
                 dbuser=current_user.login,
                 dbmethod='insert',
                 dbmodel=self._model.__table__.name,
-                dbdata=json.dumps(data, cls=MyJSONEncoder),
+                dbdata=data,
             )
             session.add(audit)
 
@@ -276,6 +274,13 @@ class SimpleResource(Resource, metaclass=SimpleResourceType):
             o = session.query(self._model).filter(
                 self._model.id == id).scalar()
 
+            if o.id != args['id']:
+                res = {
+                    'msg': 'mnUserErrorInconststentArgs',
+                    'args': [o.id, args],
+                }
+                return res, 400
+
             for k, v in args.items():
                 setattr(o, k, v)
 
@@ -287,7 +292,7 @@ class SimpleResource(Resource, metaclass=SimpleResourceType):
                 dbuser=current_user.login,
                 dbmethod='update',
                 dbmodel=self._model.__table__.name,
-                dbdata=json.dumps(data, cls=MyJSONEncoder),
+                dbdata=data,
             )
             session.add(audit)
 
@@ -303,18 +308,20 @@ class SimpleResource(Resource, metaclass=SimpleResourceType):
         with db.session() as session:
             ts = datetime.utcnow()
             if id is None:
-                for e in session.query(self._model):
-                    audit = DbAudit(
-                        id=None,
-                        dbts=ts,
-                        dbuser=current_user.login,
-                        dbmethod='delete',
-                        dbmodel=self._model.__table__.name,
-                        dbdata=json.dumps(to_dict(e), cls=MyJSONEncoder),
-                    )
-                    session.add(audit)
+                pass
 
-                    session.delete(e)
+                # for e in session.query(self._model):
+                #     audit = DbAudit(
+                #         id=None,
+                #         dbts=ts,
+                #         dbuser=current_user.login,
+                #         dbmethod='delete',
+                #         dbmodel=self._model.__table__.name,
+                #         dbdata=to_dict(e),
+                #     )
+                #     session.add(audit)
+
+                #     session.delete(e)
             else:
                 e = session.query(self._model).filter(
                     self._model.id == id).scalar()
@@ -325,13 +332,13 @@ class SimpleResource(Resource, metaclass=SimpleResourceType):
                     dbuser=current_user.login,
                     dbmethod='delete',
                     dbmodel=self._model.__table__.name,
-                    dbdata=json.dumps(to_dict(e), cls=MyJSONEncoder),
+                    dbdata=to_dict(e),
                 )
                 session.add(audit)
 
                 session.delete(e)
 
-            session.commit()
+                session.commit()
 
         return {
             'data': id

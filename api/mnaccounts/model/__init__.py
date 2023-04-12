@@ -122,25 +122,36 @@ def list_arguments_model_mixup(parser, model, only_fields=None):
                     type=ty,
                     required=False,
                     location='args')
+            if c.index:
+                parser.add_argument(
+                    '{}.{}'.format(c.table.name, c.name),
+                    type=ty,
+                    required=False,
+                    location='args')
 
 def filters_from_args(args, model):
     tables = []
     filters = []
-    inspection = inspect(model)
-    for c in inspection.mapper.columns:
-        for fk in c.foreign_keys:
-            if fk.target_fullname in args:
-                v = args[fk.target_fullname]
-                if v is not None:
-                    tables.append(fk.column.table)
-                    filters.append(fk.column == v)
-                    filters.append(c == fk.column.table.c.id)
 
-    if 'hintfld' in args \
-            and 'hintpfc' in args \
-            and args['hintfld'] and args['hintpfx']:
-        pfx = '{}%'.format(args['hintpfx'])
-        filters.append(
-            getattr(model, args['hintfld']).like(pfx))
+    if model is not None:
+        inspection = inspect(model)
+        for c in inspection.mapper.columns:
+            for fk in c.foreign_keys:
+                if fk.target_fullname in args:
+                    v = args[fk.target_fullname]
+                    if v is not None:
+                        tables.append(fk.column.table)
+                        filters.append(fk.column == v)
+                        filters.append(c == fk.column.table.c.id)
+            full_name = '{}.{}'.format(c.table.name, c.name)
+            if full_name in args and args[full_name] is not None:
+                filters.append(c == args[full_name])
+
+        if 'hintfld' in args \
+                and 'hintpfc' in args \
+                and args['hintfld'] and args['hintpfx']:
+            pfx = '{}%'.format(args['hintpfx'])
+            filters.append(
+                getattr(model, args['hintfld']).like(pfx))
 
     return set(tables), filters

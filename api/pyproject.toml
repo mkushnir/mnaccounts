@@ -23,6 +23,7 @@ dependencies = [
     "pyjwt[crypto]",
     "gunicorn",
     "alembic",
+    "mnaccounts-client @ git+https://github.com/mkushnir/mnaccounts-client.git"
 ]
 
 dynamic = [

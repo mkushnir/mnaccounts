@@ -1,4 +1,4 @@
-from builtins import (
+from builtins import (  # noqa
     max,
     min,
     all,
@@ -6,4 +6,7 @@ from builtins import (
     bool,
     len,
     sum,
+    int,
+    str,
+    float,
 )

@@ -21,7 +21,12 @@ from .resource.simple import (
     TicketResource,
 )
 
-from .resource.init import InitResource
+from .resource.manage import (
+    UserManageResource,
+    PolicyManageResource,
+)
+
+from .resource.init import InitResource, RefreshResource
 from .resource.version import VersionResource
 
 app = Flask(__name__)
@@ -48,6 +53,7 @@ cors = CORS(
 api = Api(app)
 
 api.add_resource(InitResource, '/v1/init')
+api.add_resource(RefreshResource, '/v1/refresh')
 api.add_resource(VersionResource, '/v1/version')
 
 #api.add_resource(FlaskUserResource, '/v1/flaskuser', '/v1/flaskuser/<int:id>')
@@ -58,3 +64,5 @@ api.add_resource(PolicyResource, '/v1/policy', '/v1/policy/<int:id>')
 api.add_resource(UserTargetPolicyResource, '/v1/user_target_policy', '/v1/user_target_policy/<int:id>')
 api.add_resource(UserTargetResource, '/v1/user_target')
 api.add_resource(TicketResource, '/v1/ticket', '/v1/ticket/<int:id>')
+api.add_resource(UserManageResource, '/v1/user/manage', '/v1/user/manage/<int:id>')
+api.add_resource(PolicyManageResource, '/v1/policy/manage', '/v1/policy/manage/<int:id>')

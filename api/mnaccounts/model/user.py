@@ -22,6 +22,7 @@ class User(Base):
     is_anonymous = Column(Boolean, nullable=False)
 
     authstate = Column(String, index=True)
+    ticket_lifetime = Column(Integer, nullable=True)
 
 
 UniqueConstraint(

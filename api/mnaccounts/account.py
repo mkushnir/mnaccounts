@@ -28,48 +28,65 @@ bcrypt = None
 app = None
 
 
+class ErrorTUTPRequest(ValueError):
+    pass
+
+def _tutp_from_request_args(session, request):
+    for i in ('login', 'target', 'ticket'):
+        if i not in request.args:
+            raise ErrorTUTPRequest('missing arg {}'.format(i))
+
+    res = session.query(
+        Ticket, User, Target, Policy).filter(
+            Ticket.user_id == User.id,
+            Ticket.target_id == Target.id,
+            Ticket.policy_id == Policy.id,
+            User.login == request.args['login'],
+            Target.label == request.args['target'],
+            Ticket.ticket == request.args['ticket'],
+        ).first()
+
+    if res is None:
+        raise ValueError('no such ticket: {}'.format(request.args['ticket']))
+
+    return res
+
 def _account_get():
     try:
         with mnaccounts.db.session() as session:
-            res = session.query(
-                Ticket, User, Target, Policy).filter(
-                    Ticket.user_id == User.id,
-                    Ticket.target_id == Target.id,
-                    Ticket.policy_id == Policy.id,
-                    User.login == flask.request.args['login'],
-                    Target.label == flask.request.args['target'],
-                    Ticket.ticket == flask.request.args['ticket'],
-                ).first()
+            try:
+                ticket, user, target, policy = _tutp_from_request_args(session, flask.request)
 
-            if res is None:
-                raise ValueError('no such ticket: {}'.format(ticket))
+                res = {
+                    'ticket': to_dict(
+                        ticket, except_=(
+                            'id',
+                            'user_id',
+                            'target_id',
+                            'policy_id',
+                        )
+                    ),
+                    'user': to_dict(
+                        user, except_=(
+                            # 'id',
+                            'hash',
+                            # 'apikey',
+                            'creds',
+                            'access_token',
+                            'id_token',
+                            'refresh_token',
+                            'authstate',
+                        )
+                    ),
+                    'target': to_dict(target, except_=('id',)),
+                    'policy': to_dict(policy, except_=('id',)),
+                }
 
-            ticket, user, target, policy = res
+            except ErrorTUTPRequest as e:
+                if 'uinfo' not in flask.session:
+                    raise ValueError('missing uinfo in session')
 
-            res = {
-                'ticket': to_dict(
-                    ticket, except_=(
-                        'id',
-                        'user_id',
-                        'target_id',
-                        'policy_id',
-                    )
-                ),
-                'user': to_dict(
-                    user, except_=(
-                        #'id',
-                        'hash',
-                        'apikey',
-                        'creds',
-                        'access_token',
-                        'id_token',
-                        'refresh_token',
-                        'authstate',
-                    )
-                ),
-                'target': to_dict(target, except_=('id',)),
-                'policy': to_dict(policy, except_=('id',)),
-            }
+                res = flask.session['uinfo']
 
             rv = json.dumps(res, cls=MyJSONEncoder), 200
 
@@ -92,9 +109,7 @@ def _account_get():
     return rv
 
 
-def validate_credentials(login, password):
-    #app.logger.info('validate_credentials {} {}'.format(login, password))
-
+def validate_user_password(login, password):
     with mnaccounts.db.session() as session:
         user = session.query(User).filter(
             User.login == login,
@@ -113,16 +128,34 @@ def validate_credentials(login, password):
     return None
 
 
+def validate_apikey(apikey):
+    with mnaccounts.db.session() as session:
+        user = session.query(User).filter(
+            User.apikey == apikey,
+            ).first()
+
+    return user
+
 
 def _account_post():
+    u = None
     try:
         data = flask.request.json
 
-        user = validate_credentials(data['login'], data['password'])
+        if 'login' in data and 'password' in data:
+            u = data['login']
+            user = validate_user_password(data['login'], data['password'])
+
+        elif 'apikey' in data:
+            u = data['apikey']
+            user = validate_apikey(data['apikey'])
+
+        else:
+            user  = None
 
         if user is None:
             app.logger.debug('login failure data {}'.format(data))
-            raise ValueError('wrong credentails for {}'.format(data['login']))
+            raise ValueError('wrong credentails for {}'.format(u))
 
         with mnaccounts.db.session() as session:
             res = session.query(Target, UserTargetPolicy).filter(
@@ -134,14 +167,20 @@ def _account_post():
             if res is None:
                 app.logger.debug('login failure data {}'.format(data))
                 raise ValueError('wrong target {} for {}'.format(
-                    data['target'], data['login']))
+                    data['target'], u))
 
             target, utp = res
 
             ticket_ = secrets.token_urlsafe()
 
             since = datetime.utcnow()
-            until = since + timedelta(seconds=app.config['TICKET_LIFETIME_SECONDS'])
+
+            if user.ticket_lifetime is not None:
+                lifetime = user.ticket_lifetime
+            else:
+                lifetime = app.config['TICKET_LIFETIME_SECONDS']
+
+            until = since + timedelta(seconds=lifetime)
 
             ticket = Ticket(
                 user_id=user.id,
@@ -184,7 +223,7 @@ def _account_post():
         app.logger.exception('account exception')
         res = {
             'msg': 'mnAccountFailure',
-            'args': [data['login'], str(e)],
+            'args': [u, str(e)],
         }
         rv = json.dumps(res, cls=MyJSONEncoder), 401
 
@@ -192,7 +231,7 @@ def _account_post():
         app.logger.exception('account exception')
         res = {
             'msg': 'mnAccountFailure',
-            'args': [data['login'], str(e)],
+            'args': [u, str(e)],
         }
         rv = json.dumps(res, cls=MyJSONEncoder), 400
 
@@ -237,7 +276,10 @@ def load_user_from_request(request):
     if 'uinfo' not in flask.session:
         return None
 
-    user = validate_mnaccount(flask.session['uinfo'])
+    else:
+        uinfo = flask.session['uinfo']
+
+    user = validate_mnaccount(uinfo)
 
     return user
 
@@ -292,7 +334,20 @@ def login_mnaccount():
                 app.logger.debug('login failure params {}'.format(params))
                 raise ValueError('wrong credentails for ticket {}'.format(params['ticket']))
 
-            login_user(user)
+            if not login_user(user):
+                app.logger.debug('login failure user {}'.format(to_dict(user)))
+                raise ValueError('wrong user props {} for ticket {}'.format(
+                    to_dict(user, except_=(
+                        'hash',
+                        'apikey',
+                        'creds',
+                        'access_token',
+                        'id_token',
+                        'refresh_token',
+                        'authstate',
+                    )),
+                    params['ticket'],
+                ))
 
             flask.session['uinfo'] = uinfo
 

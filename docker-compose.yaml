@@ -1,31 +1,31 @@
 version: '3.7'
 
 services:
-  api:
-    image: mnaccounts-api
+  mnaapi:
+    image: mnaccounts-api:${MNACCOUNTS_IMAGE_TAG:-latest}
     build:
       context: ${PWD}
       dockerfile: ${PWD}/Dockerfile
       target: app-api
     hostname: ${MNACCOUNTS_HOSTNAME}
-    env_file: api/.env
+    env_file: api/${MNACCOUNTS_ENVIRONMENT}.env
     ports:
-      - 127.0.0.1:5000:5000
+      - 127.0.0.1:${MNACCOUNTS_API_SERVER_PORT}:5000
     volumes:
       - type: bind
         source: ${PWD}/doc
         target: /opt/doc
       - type: bind
-        source: ${PWD}/db
-        target: /opt/db
+        source: ${PWD}/${_MNACCOUNTS_DATA_ROOT_SOURCE:-db}
+        target: ${_MNACCOUNTS_DATA_ROOT:-/opt/db}
 
-  static:
-    image: mnaccounts-static
+  mnastatic:
+    image: mnaccounts-static:${MNACCOUNTS_IMAGE_TAG:-latest}
     build:
       context: ${PWD}
       dockerfile: ${PWD}/Dockerfile
       target: app-static
     hostname: ${MNACCOUNTS_HOSTNAME}
-    env_file: static/.env
+    env_file: static/${MNACCOUNTS_ENVIRONMENT}.env
     ports:
-      - 127.0.0.1:3000:3000
+      - 127.0.0.1:${MNACCOUNTS_STATIC_SERVER_PORT}:3000

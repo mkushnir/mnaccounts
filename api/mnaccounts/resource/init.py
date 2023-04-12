@@ -10,3 +10,11 @@ class InitResource(Resource):
         return {
             'data': None
         }
+
+
+class RefreshResource(Resource):
+    def put(self):
+        db.refresh()
+        return {
+            'data': None
+        }

@@ -1,4 +1,4 @@
-# guncorn
+# gunicorn
 #accesslog = 'access.log'
 #accesslog = '-'
 access_log_format = '%(r)s %(f)s %(s)s %(b)s %(L)s'

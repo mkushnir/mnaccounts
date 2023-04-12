@@ -10,7 +10,7 @@ FROM platform-base as app-api
 RUN apk add python3 python3-dev py3-pip
 RUN cd api && pip install -U pip
 RUN cd api && pip install -e .
-CMD cd api && flask --app mnaccounts  run --host ${HOSTNAME}
+CMD cd api && flask --app mnaccounts run --host ${HOSTNAME}
 
 
 FROM platform-base as app-static
