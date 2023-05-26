@@ -111,6 +111,7 @@ export default class User extends SimpleResource {
               dataType="number"
               visible={true}
               allowEditing={false}
+              width="10%"
             >
               <RequiredRule />
             </Column>
@@ -144,6 +145,7 @@ export default class User extends SimpleResource {
             />
             <Column
               dataField="password2"
+              caption="Password (again)"
               visible={false}
               allowEditing={true}
               editorOptions={{

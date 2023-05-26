@@ -79,6 +79,7 @@ export default class Target extends SimpleResource {
               dataType="number"
               visible={true}
               allowEditing={false}
+              width="10%"
             >
             </Column>
 

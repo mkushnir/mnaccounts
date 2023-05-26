@@ -48,6 +48,9 @@ export default class Policy extends SimpleResource {
   render () {
     const edopts_resizable = {
       autoResizeEnabled: true,
+      elementAttr: {
+        class: 'mn-code',
+      },
     };
 
     return (
@@ -89,6 +92,7 @@ export default class Policy extends SimpleResource {
               dataType="number"
               visible={true}
               allowEditing={false}
+              width="10%"
             >
             </Column>
 
@@ -110,6 +114,7 @@ export default class Policy extends SimpleResource {
 
             <Column
               dataField="ts"
+              caption="Timestamp"
               dataType="datetime"
               visible={true}
               allowEditing={false}

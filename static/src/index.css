@@ -94,6 +94,7 @@
 
 .mn-head-button-selected {
   font-weight: bold !important;
+  background-color: lightgrey !important;
 }
 
 .mn-dashboard-user {
@@ -103,4 +104,8 @@
 
 .mn-numlike {
   text-align: right !important;
+}
+
+.mn-code {
+  font-family: monospace !important;
 }

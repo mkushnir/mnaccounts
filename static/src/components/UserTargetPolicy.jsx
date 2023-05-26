@@ -19,7 +19,7 @@ import {
   SearchPanel,
   //MasterDetail,
   Lookup,
-  RequiredRule,
+  //RequiredRule,
 } from 'devextreme-react/data-grid';
 
 import SimpleResource from './SimpleResource.jsx';
@@ -38,8 +38,54 @@ export default class UserTargetPolicy extends SimpleResource {
     this._policy = new Policy({...props});
   };
 
-  render () {
+  componentDidMount () {
+    this._user._mnstore.load({}).then(function (data) {
+      this.setState({
+        user: data.data,
+      });
+    }.bind(this));
+
+    this._target._mnstore.load().then(function (data) {
+      this.setState({
+        target: data.data,
+      });
+    }.bind(this));
+
+    this._policy._mnstore.load().then(function (data) {
+      this.setState({
+        policy: data.data,
+      });
+    }.bind(this));
+
+    this.setState({
+      edit_user: false,
+      edit_target: false,
+    });
+  }
+
+  _onInitNewRow = function (ev) {
     const parent_id = `${this.parent_endpoint}_id`;
+    ev.data[parent_id] = this.props.data.key;
+
+    this.setState({
+      edit_user: true,
+      edit_target: true,
+    });
+  }.bind(this);
+
+  render () {
+    if (!this.state.hasOwnProperty('user') ||
+        !this.state.hasOwnProperty('target') ||
+        !this.state.hasOwnProperty('policy') ||
+        !this.state.hasOwnProperty('edit_user') ||
+        !this.state.hasOwnProperty('edit_target')
+    ) {
+      return null;
+    }
+
+    const parent_id = `${this.parent_endpoint}_id`;
+
+    console.log(this.props)
 
     return (
       <Box
@@ -47,6 +93,8 @@ export default class UserTargetPolicy extends SimpleResource {
         width="100%"
       >
         <Item ratio={1}>
+          <h2>Bindings</h2>
+
           <DataGrid
             showBorders={false}
             dataSource={this._mnstore}
@@ -73,54 +121,64 @@ export default class UserTargetPolicy extends SimpleResource {
             <Column
               dataField="id"
               dataType="number"
-              visible={true}
+              visible={false}
               allowEditing={false}
             >
-              <RequiredRule />
+      {
+              //<RequiredRule />
+      }
             </Column>
 
             <Column
               dataField="user_id"
               dataType="number"
               visible={('user_id' !== parent_id)}
-              allowEditing={false}
+              allowEditing={this.state.edit_user}
+              caption='User'
             >
               <Lookup
-                dataSource={this._user._mnstore}
+                dataSource={this.state.user}
                 valueExpr="id"
                 displayExpr={(o) => `${o.login} (${o.email})`}
               />
-              <RequiredRule />
+      {
+              //<RequiredRule />
+      }
             </Column>
 
             <Column
               dataField="target_id"
               dataType="number"
               visible={('target_id' !== parent_id)}
-              allowEditing={false}
+              allowEditing={this.state.edit_target}
+              caption='Target'
             >
               <Lookup
-                dataSource={this._target._mnstore}
+                dataSource={this.state.target}
                 valueExpr="id"
                 displayExpr={(o) => `${o.label} (${o.url})`}
               />
-              <RequiredRule />
+      {
+              //<RequiredRule />
+      }
             </Column>
 
             <Column
               dataField="policy_id"
               dataType="number"
               visible={('policy_id' !== parent_id)}
-              allowEditing={('policy_id' !== parent_id)}
+              allowEditing={true}
+              caption='Policy'
             >
               <Lookup
-                dataSource={this._policy._mnstore}
+                dataSource={this.state.policy}
                 valueExpr="id"
                 displayExpr="label"
               />
-              <RequiredRule />
+      {
+              //<RequiredRule />
+      }
             </Column>
-
 
             <Pager
               displayMode="full"

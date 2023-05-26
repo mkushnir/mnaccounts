@@ -1,5 +1,6 @@
 """Simple db access."""
 import re
+import json
 
 import flask
 from flask_login import current_user
@@ -56,7 +57,11 @@ class TargetResource(SimpleResource):
 
 class PolicyResource(SimpleResource):
     _model = Policy
-    _black_mode = black.mode.Mode()
+    _black_mode = black.mode.Mode(
+        # target_versions={black.TargetVersion.PY33},
+        line_length=74,
+        # magic_trailing_comma=False,
+    )
 
     def _prepare_args(self, req, args):
         user_ = current_user
@@ -87,9 +92,20 @@ class PolicyResource(SimpleResource):
 
         items = policy_parse(s)
         for tag, predicate, action in items:
-            predicate = black.format_str(predicate, mode=cls._black_mode)
-            res.append('{}\t{}\n\t{};'.format(
-                tag, predicate.strip(), action if action is not None else ''))
+            if tag.startswith('api-'):
+                predicate = black.format_str(predicate, mode=cls._black_mode).strip()
+            elif tag.startswith('gui-'):
+                predicate = json.dumps(json.loads(predicate), indent=4)
+            else:
+                predicate = predicate.strip()
+
+            action = action.strip() if action is not None else ''
+            res.append('{}{}{}{};'.format(
+                tag,
+                # ' ' if predicate.startswith('policy.load') else '\n',
+                ' ' if (not action) else '\n',
+                predicate,
+                '\n{}{}'.format(' ' * 72, action) if action else ''))
 
         return '\n'.join(res)
 
