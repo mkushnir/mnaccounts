@@ -18,9 +18,9 @@ export default class Foot extends React.Component {
         <Item ratio={1}>
           <p className="mn-dashboard-user">
             <small>
-              login: {window.localStorage.getItem('login')}
+              login: {this.props.uinfo.user.login}
               <br/>
-              e-mail: {window.localStorage.getItem('email')}
+              e-mail: {this.props.uinfo.user.email}
             </small>
           </p>
         </Item>

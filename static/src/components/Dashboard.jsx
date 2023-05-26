@@ -54,7 +54,7 @@ export default class Dashboard extends React.Component {
 
           <p>Version: {this.state.version.long}</p>
 
-          <Foot />
+          <Foot { ...this.props } />
         </Item>
 
       </Box>

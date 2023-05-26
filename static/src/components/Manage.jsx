@@ -20,7 +20,7 @@ export default class Manage extends React.Component {
 
           <h1>Manage</h1>
 
-          <Foot />
+          <Foot { ...this.props } />
         </Item>
 
       </Box>
