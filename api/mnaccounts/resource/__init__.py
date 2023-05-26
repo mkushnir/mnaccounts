@@ -83,6 +83,7 @@ def mnaccess_policy(f):
                 policy,
                 (
                     'api-swaccounts',
+                    'api-mnaccounts',
                 ))
 
             if action == 'reject':
