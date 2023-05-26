@@ -1,6 +1,10 @@
 import React from 'react';
 
 import {
+  GUI_POLICY_TAG
+} from '../constant.js';
+
+import {
   logincall_promise,
 } from '../util.js';
 
@@ -67,12 +71,12 @@ export default class Login extends React.Component {
 
           const policy = parse_policy(mncitem.value.policy.statement);
 
-          const menu_items = policy.hasOwnProperty('gui-mnaccounts') ?
-            policy['gui-mnaccounts'][0].obj : null;
+          const menu_items = policy.hasOwnProperty(GUI_POLICY_TAG) ?
+            policy[GUI_POLICY_TAG][0].obj : null;
 
-          console.log('mi', menu_items);
+          //console.log('mi', menu_items);
 
-          if (menu_items.length > 0) {
+          if ((menu_items !== null) && (menu_items.length > 0)) {
             window.location.href = `/${menu_items[0]}`;
           }
         });

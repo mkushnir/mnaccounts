@@ -3,6 +3,10 @@ import React from 'react';
 import Toolbar, { Item } from 'devextreme-react/toolbar';
 
 import {
+  GUI_POLICY_TAG
+} from '../constant.js';
+
+import {
   parse_policy,
 } from '../util.js';
 
@@ -11,8 +15,8 @@ export default class Head extends React.Component {
     const policy = (this.props.uinfo !== null) ?
       parse_policy(this.props.uinfo.policy.statement) : {};
 
-    const menu_items = policy.hasOwnProperty('gui-mnaccounts') ?
-      policy['gui-mnaccounts'][0].obj : null;
+    const menu_items = policy.hasOwnProperty(GUI_POLICY_TAG) ?
+      policy[GUI_POLICY_TAG][0].obj : null;
 
     return (
         <Toolbar>

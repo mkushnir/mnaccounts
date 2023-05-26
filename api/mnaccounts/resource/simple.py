@@ -93,7 +93,12 @@ class PolicyResource(SimpleResource):
         items = policy_parse(s)
         for tag, predicate, action in items:
             if tag.startswith('api-'):
-                predicate = black.format_str(predicate, mode=cls._black_mode).strip()
+                try:
+                    predicate = black.format_str(predicate, mode=cls._black_mode).strip()
+                except Exception as e:
+                    from ..app import app
+                    app.logger.warning('black format error: {} tag {} predicate {}'.format(e, tag, predicate))
+
             elif tag.startswith('gui-'):
                 predicate = json.dumps(json.loads(predicate), indent=4)
             else:

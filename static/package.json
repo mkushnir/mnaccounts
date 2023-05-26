@@ -1,6 +1,6 @@
 {
   "name": "mnaccounts",
-  "version": "0.1.0",
+  "version": "0.0.002",
   "private": true,
   "dependencies": {
     "react": "^18.1.0",
