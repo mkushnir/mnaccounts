@@ -223,6 +223,8 @@ class SimpleResource(Resource, metaclass=SimpleResourceType):
                     e = session.execute(query).scalar()
                     data = to_dict(e)
 
+        self._pre_return(flask.request, args, data)
+
         return {
             'data': data
         }
@@ -231,6 +233,9 @@ class SimpleResource(Resource, metaclass=SimpleResourceType):
         return args
 
     def _post_commit(self, req, args, o):
+        pass
+
+    def _pre_return(self, req, args, o):
         pass
 
     def post(self):

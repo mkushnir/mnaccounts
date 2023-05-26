@@ -5,6 +5,9 @@ import flask
 from flask_login import current_user
 from flask_restful import abort
 
+import black
+import black.mode
+
 from ..model.flaskuser import FlaskUser
 from ..model.dbaudit import DbAudit
 
@@ -17,7 +20,7 @@ from ..model.ticket import Ticket
 
 from . import SimpleResource
 
-from mnaccounts.policy import policy_validation
+from mnaccounts.policy import policy_parse, policy_validation
 
 _re_spaces = re.compile(r'\s+')
 
@@ -53,6 +56,7 @@ class TargetResource(SimpleResource):
 
 class PolicyResource(SimpleResource):
     _model = Policy
+    _black_mode = black.mode.Mode()
 
     def _prepare_args(self, req, args):
         user_ = current_user
@@ -76,6 +80,26 @@ class PolicyResource(SimpleResource):
                 abort(400, msg='error in policy: {}'.format(res))
 
         return args
+
+    @classmethod
+    def _format_statement(cls, s):
+        res = []
+
+        items = policy_parse(s)
+        for tag, predicate, action in items:
+            predicate = black.format_str(predicate, mode=cls._black_mode)
+            res.append('{}\t{}\n\t{};'.format(
+                tag, predicate.strip(), action if action is not None else ''))
+
+        return '\n'.join(res)
+
+    def _pre_return(self, req, args, o):
+        if req.method == 'GET':
+            if type(o) == list:
+                for i in o:
+                    i['statement'] = self._format_statement(i['statement'])
+        else:
+            o['statement'] = self._format_statement(o['statement'])
 
 
 class UserTargetPolicyResource(SimpleResource):
