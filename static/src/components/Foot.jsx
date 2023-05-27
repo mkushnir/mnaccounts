@@ -18,7 +18,7 @@ export default class Foot extends React.Component {
         <Item ratio={1}>
           <p className="mn-dashboard-user">
             <small>
-              login: {this.props.uinfo.user.login}
+              login: {this.props.uinfo.user.login} (as {this.props.uinfo.policy.label})
               <br/>
               e-mail: {this.props.uinfo.user.email}
             </small>

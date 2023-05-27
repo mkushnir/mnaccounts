@@ -172,7 +172,6 @@ export default class User extends SimpleResource {
               visible={true}
               allowEditing={true}
             >
-              <RequiredRule />
             </Column>
 
             <Column
