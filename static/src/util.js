@@ -9,6 +9,7 @@ import {
 import {
   APIHOST,
   LOGINHOST,
+  GUI_POLICY_TAG
 } from  './constant.js'
 
 const re_cookie = new RegExp('^([^=]+)=(.*)$');
@@ -319,7 +320,7 @@ export function cmp_version (va, vb) {
 
 
 const _re_policy_statement = new RegExp('\\s*(\\S+)\\s+(.+?)\\s+(\\baccept|\\breject|\\bnull)?\\s*;', 'gs');
-const _policy_tags = ['gui-mnaccounts'];
+const _policy_tags = [GUI_POLICY_TAG];
 
 export function parse_policy (stmt) {
   const m = stmt.matchAll(_re_policy_statement);

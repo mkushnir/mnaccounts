@@ -61,20 +61,16 @@ export default class Login extends React.Component {
       params,
       this.state.data,
     ).then(function (data) {
-      //console.log('data', data);
 
       if (data === undefined) {
         //window.alert(sprintf.sprintf(formatMessage('mnLoginFailure'), user));
       } else {
         mncache_set('uinfo', data['data'], function (mncitem) {
-          //console.log('set', mncitem);
 
           const policy = parse_policy(mncitem.value.policy.statement);
 
           const menu_items = policy.hasOwnProperty(GUI_POLICY_TAG) ?
             policy[GUI_POLICY_TAG][0].obj : null;
-
-          //console.log('mi', menu_items);
 
           if ((menu_items !== null) && (menu_items.length > 0)) {
             window.location.href = `/${menu_items[0]}`;

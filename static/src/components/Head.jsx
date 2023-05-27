@@ -25,7 +25,9 @@ export default class Head extends React.Component {
             const name = value[1];
 
             if ((name !== 'Logout') &&
-                ((menu_items === null) || (!menu_items.includes(name)))) {
+                ((menu_items === null) ||
+                  (!(menu_items.includes(name) ||
+                     menu_items.includes('all'))))) {
               return null;
             }
 

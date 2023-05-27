@@ -22,6 +22,9 @@ import {
   //RequiredRule,
 } from 'devextreme-react/data-grid';
 
+import Head from './Head.jsx';
+import Foot from './Foot.jsx';
+
 import SimpleResource from './SimpleResource.jsx';
 import User from './User.jsx';
 import Target from './Target.jsx';
@@ -64,8 +67,10 @@ export default class UserTargetPolicy extends SimpleResource {
   }
 
   _onInitNewRow = function (ev) {
-    const parent_id = `${this.parent_endpoint}_id`;
-    ev.data[parent_id] = this.props.data.key;
+    if (this.props.hasOwnProperty('data') && (this.parent_endpoint !== null)) {
+      const parent_id = `${this.parent_endpoint}_id`;
+      ev.data[parent_id] = this.props.data.key;
+    }
 
     this.setState({
       edit_user: true,
@@ -85,15 +90,21 @@ export default class UserTargetPolicy extends SimpleResource {
 
     const parent_id = `${this.parent_endpoint}_id`;
 
-    console.log(this.props)
-
     return (
       <Box
         direction="row"
         width="100%"
       >
         <Item ratio={1}>
-          <h2>Bindings</h2>
+      {
+          (this.parent_endpoint === null) ? <Head { ... this.props }  /> : null
+      }
+
+      {
+          (this.parent_endpoint === null) ?  <h1>User/Target/Policy Bindings</h1> : <h3>Bindings</h3>
+      }
+
+
 
           <DataGrid
             showBorders={false}
@@ -139,7 +150,7 @@ export default class UserTargetPolicy extends SimpleResource {
               <Lookup
                 dataSource={this.state.user}
                 valueExpr="id"
-                displayExpr={(o) => `${o.login} (${o.email})`}
+                displayExpr={(o) => (o !== null) ? `${o.login} (${o.email})` : ''}
               />
       {
               //<RequiredRule />
@@ -156,7 +167,7 @@ export default class UserTargetPolicy extends SimpleResource {
               <Lookup
                 dataSource={this.state.target}
                 valueExpr="id"
-                displayExpr={(o) => `${o.label} (${o.url})`}
+                displayExpr={(o) => (o !== null) ? `${o.label} (${o.url})` : ''}
               />
       {
               //<RequiredRule />
@@ -199,6 +210,11 @@ export default class UserTargetPolicy extends SimpleResource {
             </Editing>
 
           </DataGrid>
+
+      {
+        (this.parent_endpoint === null) ?  <Foot { ...this.props } /> : null
+      }
+
         </Item>
 
       </Box>

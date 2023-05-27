@@ -68,7 +68,13 @@ class PolicyResource(SimpleResource):
         session_ = flask.session
         request_ = flask.Request({
         })
+
         statement_ = args['statement']
+
+        try:
+            self._format_statement(statement_)
+        except Exception as e:
+                abort(400, msg='error in policy syntax: {}'.format(e))
 
         tag_selector = ('api-mnaccounts', )
 
@@ -87,27 +93,45 @@ class PolicyResource(SimpleResource):
         return args
 
     @classmethod
-    def _format_statement(cls, s):
+    def _format_statement(cls, s, raise_exceptions=True):
         res = []
 
         items = policy_parse(s)
         for tag, predicate, action in items:
             if tag.startswith('api-'):
                 try:
-                    predicate = black.format_str(predicate, mode=cls._black_mode).strip()
+                    predicate = black.format_str(
+                        predicate, mode=cls._black_mode).strip()
+
                 except Exception as e:
-                    from ..app import app
-                    app.logger.warning('black format error: {} tag {} predicate {}'.format(e, tag, predicate))
+                    if raise_exceptions:
+                        raise
+
+                    else:
+                        from ..app import app
+                        app.logger.warning('black format error: {} tag {} '
+                                           'predicate {}'.format(
+                                               e, tag, predicate))
 
             elif tag.startswith('gui-'):
-                predicate = json.dumps(json.loads(predicate), indent=4)
+                try:
+                    predicate = json.dumps(json.loads(predicate), indent=4)
+                except Exception as e:
+                    if raise_exceptions:
+                        raise
+
+                    else:
+                        from ..app import app
+                        app.logger.warning('json format error: {} tag {} '
+                                           'predicate {}'.format(
+                                               e, tag, predicate))
             else:
                 predicate = predicate.strip()
 
             action = action.strip() if action is not None else ''
+
             res.append('{}{}{}{};'.format(
                 tag,
-                # ' ' if predicate.startswith('policy.load') else '\n',
                 ' ' if (not action) else '\n',
                 predicate,
                 '\n{}{}'.format(' ' * 72, action) if action else ''))
@@ -118,9 +142,11 @@ class PolicyResource(SimpleResource):
         if req.method == 'GET':
             if type(o) == list:
                 for i in o:
-                    i['statement'] = self._format_statement(i['statement'])
-        else:
-            o['statement'] = self._format_statement(o['statement'])
+                    i['statement'] = self._format_statement(
+                        i['statement'], raise_exceptions=False)
+            else:
+                o['statement'] = self._format_statement(
+                        o['statement'], raise_exceptions=False)
 
 
 class UserTargetPolicyResource(SimpleResource):
