@@ -44,7 +44,7 @@ class App extends React.Component {
   }
 
   _build_path(name) {
-    return `/${name}`
+    return `/${name}`;
   }
 
   constructor (props) {

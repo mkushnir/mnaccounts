@@ -82,7 +82,7 @@ def mnaccess_policy(f):
                 flask.request,
                 policy,
                 (
-                    'api-swaccounts',
+                    # 'api-swaccounts',
                     'api-mnaccounts',
                 ))
 

@@ -9,7 +9,7 @@ import {
 import {
   APIHOST,
   LOGINHOST,
-  GUI_POLICY_TAG
+  GUI_POLICY_TAG,
 } from  './constant.js'
 
 const re_cookie = new RegExp('^([^=]+)=(.*)$');
@@ -53,13 +53,15 @@ export function build_loginurl (what, params=null) {
     for (const [k, v] of Object.entries(params)) {
       if (Array.isArray(v)) {
         for (const i of v) {
-          pieces.push(sprintf.sprintf(
-            '%s=%s', encodeURIComponent(k), encodeURIComponent(i)));
+          //pieces.push(sprintf.sprintf(
+          //  '%s=%s', encodeURIComponent(k), encodeURIComponent(i)));
+          pieces.push(`${encodeURIComponent(k)}=${encodeURIComponent(i)}`);
         }
       } else {
         // scalars expected
-        pieces.push(sprintf.sprintf(
-          '%s=%s', encodeURIComponent(k), encodeURIComponent(v)));
+        //pieces.push(sprintf.sprintf(
+        //  '%s=%s', encodeURIComponent(k), encodeURIComponent(v)));
+        pieces.push(`${encodeURIComponent(k)}=${encodeURIComponent(v)}`);
       }
     }
     qstr = '?' + pieces.join('&');
@@ -129,19 +131,22 @@ export function build_apiurl (what, params=null) {
     for (const [k, v] of Object.entries(params)) {
       if (Array.isArray(v)) {
         for (const i of v) {
-          pieces.push(sprintf.sprintf(
-            '%s=%s', encodeURIComponent(k), encodeURIComponent(i)));
+          //pieces.push(sprintf.sprintf(
+          //  '%s=%s', encodeURIComponent(k), encodeURIComponent(i)));
+          pieces.push(`${encodeURIComponent(k)}=${encodeURIComponent(i)}`);
         }
       } else {
         // scalars expected
-        pieces.push(sprintf.sprintf(
-          '%s=%s', encodeURIComponent(k), encodeURIComponent(v)));
+        //pieces.push(sprintf.sprintf(
+        //  '%s=%s', encodeURIComponent(k), encodeURIComponent(v)));
+        pieces.push(`${encodeURIComponent(k)}=${encodeURIComponent(v)}`);
       }
     }
     qstr = '?' + pieces.join('&');
   }
 
-  return sprintf.sprintf('%s%s%s', APIHOST, what, qstr);
+  //return sprintf.sprintf('%s%s%s', APIHOST, what, qstr);
+  return `${APIHOST}${what}${qstr}`;
 }
 
 
