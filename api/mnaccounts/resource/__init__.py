@@ -82,8 +82,8 @@ def mnaccess_policy(f):
                 flask.request,
                 policy,
                 (
-                    # 'api-swaccounts',
-                    'api-mnaccounts',
+                    'api-swaccounts',
+                    # 'api-mnaccounts',
                 ))
 
             if action == 'reject':

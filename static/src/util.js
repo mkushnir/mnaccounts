@@ -182,28 +182,6 @@ export function apicall_promise (meth, what, params=null, data=null, cb=null) {
     credentials: 'include',
   };
 
-  //const access_token = window.localStorage.getItem('access_token');
-  //const apikey = window.localStorage.getItem('apikey');
-  //const login = window.localStorage.getItem('login');
-  //const password = window.localStorage.getItem('password');
-
-  //if (access_token) {
-  //  fparams.headers['Authorization'] = sprintf.sprintf(
-  //    'Bearer %s', access_token);
-
-  //} else if (apikey) {
-  //  fparams.headers['Authorization'] = sprintf.sprintf(
-  //    'apikey %s', apikey);
-
-  //} else if (login && password) {
-  //  fparams.headers['Authorization'] = sprintf.sprintf(
-  //    'Basic %s', btoa(sprintf.sprintf('%s:%s', login, password)));
-  //}
-
-  //if (!fparams.headers.hasOwnProperty('Authorization')) {
-  //  throw Error(`API Not Logged In when calling ${meth} ${what} ${params}`);
-  //}
-
   if (data !== null) {
     fparams.body = JSON.stringify(data);
     fparams.headers['Content-Type'] = 'application/json';

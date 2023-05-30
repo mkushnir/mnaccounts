@@ -33,6 +33,10 @@ class FlaskUserResource(SimpleResource):
 
         if 'password' in req.json:
             args['hash'] = bcrypt.generate_password_hash(req.json['password'])
+        else:
+            if 'hash' in args:
+                del args['hash']
+
         return args
 
 
@@ -48,6 +52,9 @@ class UserResource(SimpleResource):
 
         if 'password' in req.json:
             args['hash'] = bcrypt.generate_password_hash(req.json['password'])
+        else:
+            if 'hash' in args:
+                del args['hash']
         return args
 
 
@@ -76,7 +83,10 @@ class PolicyResource(SimpleResource):
         except Exception as e:
                 abort(400, msg='error in policy syntax: {}'.format(e))
 
-        tag_selector = ('api-mnaccounts', )
+        tag_selector = (
+            # 'api-mnaccounts',
+            'api-swaccounts',
+        )
 
         rv = policy_validation(
             session_,

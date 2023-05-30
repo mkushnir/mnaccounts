@@ -20,6 +20,7 @@ import {
   MasterDetail,
   //Lookup,
   RequiredRule,
+  EmailRule,
 } from 'devextreme-react/data-grid';
 
 import Head from './Head.jsx';
@@ -133,6 +134,15 @@ export default class User extends SimpleResource {
               }}
             >
               <RequiredRule />
+              <EmailRule />
+            </Column>
+
+            <Column
+              dataField="is_active"
+              dataType="boolean"
+              visible={true}
+              allowEditing={true}
+            >
             </Column>
 
             <Column
@@ -167,14 +177,6 @@ export default class User extends SimpleResource {
             />
 
             <Column
-              dataField="is_active"
-              dataType="boolean"
-              visible={true}
-              allowEditing={true}
-            >
-            </Column>
-
-            <Column
               dataField="is_anonymous"
               dataType="boolean"
               visible={false}
@@ -203,20 +205,20 @@ export default class User extends SimpleResource {
               allowAdding={true}
             >
               <Form
-                colCount="auto"
+                colCount={2}
                 labelMode="floating"
                 labelLocation="top"
               >
                 <Item itemType="group" colCount="1">
                   <Item dataField="login" />
                   <Item dataField="email" />
+                  <Item dataField="is_active" />
                 </Item>
 
                 <Item itemType="group" colCount="1">
                   <Item dataField="password" />
                   <Item dataField="password2" />
                   <Item dataField="apikey" />
-                  <Item dataField="is_active" />
                 </Item>
 
               </Form>

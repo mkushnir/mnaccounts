@@ -6,6 +6,10 @@ import  {
 } from 'devextreme-react/box';
 
 import {
+  logincall_promise,
+} from '../util.js';
+
+import {
   mncache_delete,
 } from '../db.js';
 
@@ -18,8 +22,20 @@ export default class Logout extends React.Component {
   };
 
   componentDidMount () {
+    if (this.props.uinfo !== null) {
+      logincall_promise (
+        'DELETE',
+        'account',
+        null,
+        {
+          ticket: this.props.uinfo.ticket.ticket,
+        }
+      ).then(function (data) {
+        // pass
+      });
+    };
+
     mncache_delete('uinfo', function (o) {
-      //console.log('uinfo:', o);
       setTimeout(function () {
         window.location.href = '/Login';
       }, 2500);
