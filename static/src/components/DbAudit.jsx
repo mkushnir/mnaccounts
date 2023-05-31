@@ -149,7 +149,7 @@ export default class DbAudit extends SimpleResource {
               dataField="dbdata"
               dataType="object"
               caption="Data"
-              customizeText={(o) => JSON.stringify(o, null, 2)}
+              customizeText={(o) => JSON.stringify(o['value'], null, 2)}
               visible={true}
               allowEditing={false}
             >
