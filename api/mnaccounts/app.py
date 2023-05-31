@@ -57,7 +57,7 @@ api.add_resource(RefreshResource, '/v1/refresh')
 api.add_resource(VersionResource, '/v1/version')
 
 #api.add_resource(FlaskUserResource, '/v1/flaskuser', '/v1/flaskuser/<int:id>')
-#api.add_resource(DbAuditResource, '/v1/dbaudit', '/v1/dbaudit/<int:id>')
+api.add_resource(DbAuditResource, '/v1/dbaudit', '/v1/dbaudit/<int:id>')
 api.add_resource(UserResource, '/v1/user', '/v1/user/<int:id>')
 api.add_resource(TargetResource, '/v1/target', '/v1/target/<int:id>')
 api.add_resource(PolicyResource, '/v1/policy', '/v1/policy/<int:id>')

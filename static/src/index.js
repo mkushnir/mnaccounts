@@ -22,9 +22,8 @@ import User from './components/User.jsx';
 import Target from './components/Target.jsx';
 import Policy from './components/Policy.jsx';
 import UserTargetPolicy from './components/UserTargetPolicy.jsx';
+import DbAudit from './components/DbAudit.jsx';
 import Manage from './components/Manage.jsx';
-//import Search from './components/Search.jsx';
-//import Manage from './components/Manage.jsx';
 import Logout from './components/Logout.jsx';
 
 class App extends React.Component {
@@ -35,6 +34,7 @@ class App extends React.Component {
     Target,
     Policy,
     UserTargetPolicy,
+    DbAudit,
     Manage,
     Logout,
   ];
