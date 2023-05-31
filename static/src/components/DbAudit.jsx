@@ -31,6 +31,9 @@ import User from './User.jsx';
 
 export default class DbAudit extends SimpleResource {
   endpoint = 'dbaudit';
+  default_load_params = {
+    sort: 'D'
+  };
 
   constructor (props) {
     super(props);

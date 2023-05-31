@@ -11,6 +11,7 @@ export default class SimpleResource extends React.Component {
   parent_endpoint = null;
 
   endpoint = null;
+  default_load_params = {};
 
   _get_endpoint (meth) {
     return this.endpoint;
@@ -27,7 +28,7 @@ export default class SimpleResource extends React.Component {
       key: 'id',
 
       load: function (params) {
-        let rparams = {};
+        let rparams = Object.assign(this.default_load_params);
         if (this.parent_endpoint !== null) {
           if (this.props.data && (this.props.data.column.command === 'detail')) {
             //rparams[sprintf.sprintf('%s.id', this.parent_endpoint)] = this.props.data.key;
