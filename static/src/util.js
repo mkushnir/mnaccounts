@@ -207,6 +207,10 @@ export function apicall_promise (meth, what, params=null, data=null, cb=null) {
           response.status,
           fmsg1 ? fmsg1 : msg));
 
+        if (response.status === 401) {
+          window.location.href = '/Logout';
+        }
+
       }).catch(function (error) {
         console.error('apicall_promise response body error', error);
       });

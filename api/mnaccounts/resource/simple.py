@@ -76,7 +76,7 @@ class PolicyResource(SimpleResource):
         request_ = flask.Request({
         })
 
-        statement_ = args['statement']
+        statement_ = _re_spaces.sub(' ', args['statement'])
 
         try:
             self._format_statement(statement_)
@@ -92,13 +92,15 @@ class PolicyResource(SimpleResource):
             session_,
             user_,
             request_,
-            _re_spaces.sub(' ', statement_),
+            statement_,
             tag_selector,
         )
 
         for level, idx, (tag, pred, action), res in rv:
             if isinstance(res, Exception):
                 abort(400, msg='error in policy: {}'.format(res))
+
+        args['statement'] = statement_
 
         return args
 

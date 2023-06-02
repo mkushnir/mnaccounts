@@ -42,9 +42,11 @@ export default class DbAudit extends SimpleResource {
 
   componentDidMount () {
     this._user._mnstore.load({}).then(function (data) {
-      this.setState({
-        user: data.data,
-      });
+      if (data !== null) {
+        this.setState({
+          user: data.data,
+        });
+      }
     }.bind(this));
   }
 
