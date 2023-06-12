@@ -114,7 +114,7 @@ class MNAccountAPIClient(_MNAccountAPIClientBase):
     def api_user_target_get(self, user_id=None):
         params = {}
         if user_id is not None:
-            params['user_id'] = user_id
+            params['user.id'] = user_id
         res = self._api_call('get', '/v1/user_target', params=params)
         return res['data']
 
