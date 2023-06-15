@@ -39,8 +39,6 @@ export default class Login extends React.Component {
   constructor (props) {
     super(props);
 
-    //window.localStorage.clear();
-
     this.state = {
       data: {
         login: null,
@@ -66,7 +64,6 @@ export default class Login extends React.Component {
         //window.alert(sprintf.sprintf(formatMessage('mnLoginFailure'), user));
       } else {
         mncache_set('uinfo', data['data'], function (mncitem) {
-
           const policy = parse_policy(mncitem.value.policy.statement);
 
           const menu_items = policy.hasOwnProperty(GUI_POLICY_TAG) ?
