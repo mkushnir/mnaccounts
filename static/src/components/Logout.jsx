@@ -16,6 +16,11 @@ import {
 import Head from './Head.jsx';
 
 export default class Logout extends React.Component {
+  _route () {
+    return 'Logout';
+  };
+
+
   constructor (props) {
     super(props);
     window.localStorage.clear();

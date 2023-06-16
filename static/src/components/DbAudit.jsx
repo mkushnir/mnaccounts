@@ -30,6 +30,11 @@ import SimpleResource from './SimpleResource.jsx';
 import User from './User.jsx';
 
 export default class DbAudit extends SimpleResource {
+  _route () {
+    return 'DbAudit';
+  };
+
+
   endpoint = 'dbaudit';
   default_load_params = {
     sort: 'D'

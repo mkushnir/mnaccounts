@@ -40,7 +40,7 @@ class App extends React.Component {
   ];
 
   _component_name(component) {
-    return component.prototype.constructor.prototype.constructor.name;
+    return component.prototype._route();
   }
 
   _build_path(name) {
@@ -83,16 +83,18 @@ class App extends React.Component {
 
     if (!r) {
       // default to Login
-      window.location.href = this._build_path(
+      const hr = this._build_path(
         this._component_name(this._all_components[0]));
+      window.location.href = hr;
 
     } else {
       const component = r[0];
       const cname = this._component_name(component);
 
       if ((this.state.uinfo === null) && (cname !== 'Login')) {
-        window.location.href = this._build_path(
+        const hr = this._build_path(
           this._component_name(this._all_components[0]));
+        window.location.href = hr;
 
       } else {
         const el = React.createElement(

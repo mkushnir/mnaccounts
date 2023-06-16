@@ -26,6 +26,10 @@ import Head from './Head.jsx';
 import Foot from './Foot.jsx';
 
 export default class Dashboard extends React.Component {
+  _route () {
+    return 'Dashboard';
+  };
+
   componentDidMount () {
     setTimeout(function () {
       api_version(function (data) {

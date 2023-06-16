@@ -31,6 +31,10 @@ import {UTPPolicy} from './UserTargetPolicy.jsx';
 import 'devextreme-react/text-area';
 
 export default class Policy extends SimpleResource {
+  _route () {
+    return 'Policy';
+  };
+
   endpoint = 'policy';
 
   _onInitNewRow = function (ev) {

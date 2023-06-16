@@ -31,6 +31,10 @@ import Target from './Target.jsx';
 import Policy from './Policy.jsx';
 
 export default class UserTargetPolicy extends SimpleResource {
+  _route () {
+    return 'UserTargetPolicy';
+  };
+
   endpoint = 'user_target_policy';
 
   constructor (props) {

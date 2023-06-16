@@ -36,6 +36,10 @@ import {
 import Head from './Head.jsx';
 
 export default class Login extends React.Component {
+  _route () {
+    return 'Login';
+  };
+
   constructor (props) {
     super(props);
 

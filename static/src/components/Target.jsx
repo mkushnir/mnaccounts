@@ -30,6 +30,10 @@ import {UTPTarget} from './UserTargetPolicy.jsx';
 
 
 export default class Target extends SimpleResource {
+  _route () {
+    return 'Target';
+  };
+
   endpoint = 'target';
 
   _onInitNewRow = function (ev) {

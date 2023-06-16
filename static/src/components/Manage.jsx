@@ -24,6 +24,11 @@ import Head from './Head.jsx';
 import Foot from './Foot.jsx';
 
 export default class Manage extends React.Component {
+  _route () {
+    return 'Manage';
+  };
+
+
   constructor (props) {
     super(props);
     this.state = {

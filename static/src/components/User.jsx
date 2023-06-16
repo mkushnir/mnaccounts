@@ -31,6 +31,10 @@ import {UTPUser} from './UserTargetPolicy.jsx';
 
 
 export default class User extends SimpleResource {
+  _route () {
+    return 'User';
+  };
+
   endpoint = 'user';
 
   _password_valid(row) {
