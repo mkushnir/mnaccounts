@@ -148,7 +148,7 @@ def filters_from_args(args, model):
                 filters.append(c == args[full_name])
 
         if 'hintfld' in args \
-                and 'hintpfc' in args \
+                and 'hintpfx' in args \
                 and args['hintfld'] and args['hintpfx']:
             pfx = '{}%'.format(args['hintpfx'])
             filters.append(
